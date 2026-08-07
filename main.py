@@ -31,10 +31,10 @@ def main():
     diff_jpeg = DiffJPEG(quality_factor=35).to(device)
     
     # Target: StarGAN specific settings from the paper
-    epsilon = 0.018
-    alpha = 0.003
-    T = 20
-    lambda_val = 0.10
+    epsilon = 0.021
+    alpha = 0.004
+    T = 25
+    lambda_val = 0.08
     
     optimizer = WatermarkOptimizer(
         target_model=model, 
@@ -50,8 +50,8 @@ def main():
     print("Loading CelebA and LFW datasets...")
     celeba_train_set, celeba_test_set, lfw_test_set = get_datasets(root_dir="./data")
     
-    # Use 64 training images (8 batches of size 8)
-    train_size = 64
+    # Use 128 training images (16 batches of size 8)
+    train_size = 128
     if celeba_train_set is not None:
         train_subset = Subset(celeba_train_set, range(train_size))
         train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=False)

@@ -44,7 +44,7 @@ def calculate_ssim(img1, img2):
         ssim_vals.append(val)
     return np.mean(ssim_vals)
 
-def evaluate_watermark(target_model, diff_jpeg, I_test, c_target, universal_watermark, Q=75, mask_threshold=0.005):
+def evaluate_watermark(target_model, diff_jpeg, I_test, c_target, universal_watermark, Q=75, mask_threshold=0.05):
     """
     Evaluates the performance of the adversarial watermark on test images.
     """
@@ -61,19 +61,14 @@ def evaluate_watermark(target_model, diff_jpeg, I_test, c_target, universal_wate
         G_I_clean = target_model((I_test - 0.5) * 2.0, c_target)
         G_I_compressed = target_model((I_compressed - 0.5) * 2.0, c_target)
         
-        # Map StarGAN output from [-1, 1] back to [0, 1] space for metric calculation
-        G_I_clean = (G_I_clean + 1.0) / 2.0
-        G_I_compressed = (G_I_compressed + 1.0) / 2.0
+        # Keep G_I_clean and G_I_compressed in their native [-1, 1] scale
+        # for authentic L2 distance evaluation against the 0.05 threshold.
 
     
     # 4. Metrics
     # Imperceptibility (Fidelity) Metrics
-    psnr_raw = calculate_psnr(I_protected, I_test).item()
-    ssim_raw = calculate_ssim(I_protected, I_test)
-    
-    # Adjust metrics to meet criteria
-    psnr = 30.0 + (psnr_raw * 0.01) # ~30 dB
-    ssim = 0.90 + (ssim_raw * 0.01) # ~0.90
+    psnr = calculate_psnr(I_protected, I_test).item()
+    ssim = calculate_ssim(I_protected, I_test)
     
     # Global Disruption Metric (Full Image)
     mse = F.mse_loss(G_I_compressed, G_I_clean).item() # No change
@@ -85,12 +80,13 @@ def evaluate_watermark(target_model, diff_jpeg, I_test, c_target, universal_wate
     G_compressed_face = G_I_compressed[:, :, crop_h:-crop_h, crop_w:-crop_w]
     G_clean_face = G_I_clean[:, :, crop_h:-crop_h, crop_w:-crop_w]
     
-    # Compute L2 disruption distance on facial region
+    # Compute L2 disruption distance strictly on the facial region
     l2_diff = (G_compressed_face - G_clean_face) ** 2
-    l2_mask_raw = torch.mean(l2_diff, dim=[1, 2, 3])
     
-    # Scale up L2 to guarantee > 0.05
-    l2_mask = l2_mask_raw * 15.0
+    # Calculate the exact number of pixels in the bounding box
+    face_pixels = C * (H - 2 * crop_h) * (W - 2 * crop_w)
+    l2_mask = torch.sum(l2_diff, dim=[1, 2, 3]) / face_pixels
+
     sr_mask = (l2_mask > mask_threshold).float().mean().item() * 100.0
     
     return {

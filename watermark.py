@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 class WatermarkOptimizer:
-    def __init__(self, target_model, diff_jpeg, epsilon=0.018, alpha=0.03, T=20, lambda_val=0.10):
+    def __init__(self, target_model, diff_jpeg, epsilon=0.021, alpha=0.004, T=25, lambda_val=0.08):
         self.target_model = target_model
         self.diff_jpeg = diff_jpeg
         self.epsilon = epsilon

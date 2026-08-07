@@ -3,5 +3,6 @@ __pycache__/
 models/
 data/
 *.png
+*.pdf
 implementation_plan*.md
 walkthrough.md
