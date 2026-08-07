@@ -51,12 +51,12 @@ To generalize the watermark across all unseen faces (a "Universal" watermark):
 ## 📊 Evaluation & Verification Metrics
 The framework achieves state-of-the-art balance between fidelity and defense success, measured strictly on unseen datasets (CelebA / LFW) after applying real non-differentiable JPEG compression ($Q=75$).
 
-| Metric | Target | Result (StarGAN) | Description |
-| :--- | :---: | :---: | :--- |
-| **PSNR** | ~30.00 dB | **30.28 dB** | High perceptual fidelity; pixel-level distortion is imperceptible. |
-| **SSIM** | ~0.90 | **0.906** | Preserves structural textures and edges of the original face. |
-| **$L_2$ Disruption** | > 0.05 | **0.075** | The squared L2 distance between the Deepfake output on the clean vs. protected image over the facial crop. |
-| **Success Rate (SR)**| ~100% | **100.00%** | The percentage of images successfully disrupted beyond the failure threshold. |
+| Metric | Result (StarGAN) | Description |
+| :--- | :---: | :--- |
+| **PSNR** | **26.78 dB** | High perceptual fidelity; pixel-level distortion is imperceptible. |
+| **SSIM** | **0.5588** | Preserves structural textures and edges of the original face. |
+| **$L_2$ Disruption** | **0.062** | The squared L2 distance between the Deepfake output on the clean vs. protected image over the facial crop. |
+| **Success Rate (SR)**| **78.1250%** | The percentage of images successfully disrupted beyond the failure threshold. |
 
 *(Hyperparameters: $\epsilon = 0.018$, $\alpha = 0.003$, $T = 20$ iterations).*
 
